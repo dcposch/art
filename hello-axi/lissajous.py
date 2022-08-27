@@ -1,6 +1,7 @@
 from re import S
 from pyaxidraw import axidraw
 import math
+import random
 
 ad = axidraw.AxiDraw()
 ad.interactive()
@@ -10,8 +11,9 @@ ad.options.const_speed = True
 ad.connect()
 
 # Bounds for letter paper, in inches
-bx = [1, 10]
-by = [1, 7.5]
+margin = [2, 2]
+bx = [margin[0], 11-margin[0]]
+by = [margin[1], 8.5-margin[1]]
 
 
 def to_pos(x, y):
@@ -23,8 +25,9 @@ def to_pos(x, y):
 
 
 # Lissajous
-p = [2, 3]  # a circle
-print("Printing a lissajous figure with parameter %r" % p)
+p = [1, 1]
+jitter = 0
+print("Plotting a lissajous figure. Param %r, jitter %r" % (p, jitter))
 
 p0 = to_pos(1, 0)
 ad.moveto(p0[0], p0[1])
@@ -32,11 +35,13 @@ step_rad = 0.05 / math.sqrt(p[0]**2 + p[1]**2)
 theta = 0
 while theta < 2 * math.pi:
     pn = to_pos(math.cos(theta*p[0]), math.sin(theta*p[1]))
+    pn[0] += (random.random()*2-1) * jitter
+    pn[1] += (random.random()*2-1) * jitter
     ad.lineto(pn[0], pn[1])
     theta += step_rad
-
+ad.lineto(p0[0], p0[1])
 print("Done")
+
 ad.penup()
 ad.moveto(0, 0)
-
 ad.disconnect()

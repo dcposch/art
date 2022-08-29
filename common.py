@@ -18,6 +18,8 @@ def safe_plot(draw_func):
         draw_func(ad)
     except Exception as e:
         print(e)
+    except KeyboardInterrupt:
+        print("Interrupted, stopping...")
 
     # Move home
     print("Returning to home...")

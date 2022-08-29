@@ -11,9 +11,47 @@ bx = [margin[0], 12-margin[0]]
 by = [margin[1], 9-margin[1]]
 
 # Random walk step size
-step = 0.1
-w = (bx[1]-bx[0]-margin[0]*2)/step
-h = (by[1]-by[0]-margin[1]*2)/step
+step_x = 0.1
+step_y = step_x * math.sqrt(3) / 2
+w = math.floor((bx[1]-bx[0]-margin[0]*2)/step_x)
+h = math.floor((by[1]-by[0]-margin[1]*2)/step_y)
+
+# Hex coordinates
+#
+# x =     \1__/2    \4__/5       y = 3
+#         /   \     /   \ 
+# x = 0__/1    \3__/4    \6__/   y = 2
+#        \     /   \     /   \
+# x =     \1__/2    \4__/5       y = 1
+#
+
+def loc_in(x, y):
+    """Given x and y in hex coordinates, returns a location in inches."""
+    if y % 2 > 0:
+        x += 0.5
+    return [
+        bx[0] + margin[0] + step_x*x,
+        by[0] + margin[1] + step_y*y
+    ]
+
+def move_rand(x, y):
+    xn = x % 6
+    yn = y % 2
+
+    case = xn - yn
+    if case not in [0, 1, 3, 4]:
+        raise Exception("%d %d not hex"%(x, y))
+
+    direction = random.randint(0, 2)
+    if direction == 0:
+        x += 1 if case in [0, 3] else -1
+    else:
+        y += 1 if direction == 1 else -1
+        if (xn, yn) in [(2, 1), (5, 1)]:
+            x += 1
+        if (xn, yn) in [(3, 0), (0, 0)]:
+            x -= 1
+    return (x, y)
 
 def draw_random_walk(ad):
     # Initial location
@@ -21,9 +59,9 @@ def draw_random_walk(ad):
     y = h / 2
 
     # Number of steps
-    n = 4000
+    n = 5000
 
-    print("Plotting a random walk, %d steps, step size %r in"%(n, step))
+    print("Plotting a random walk, %d steps, step size %r in"%(n, step_x))
     visit_count = collections.defaultdict(lambda: 0)
     visit_count[(x, y)] = 1
 
@@ -56,23 +94,5 @@ def draw_random_walk(ad):
         l = loc_in(x, y)
         ad.lineto(l[0], l[1])
 
-def loc_in(x, y):
-    """Given x and y in grid coordinates, returns a location in inches."""
-    return [
-        bx[0] + margin[0] + step*x,
-        by[0] + margin[1] + step*y
-    ]
-
-def move_rand(x, y):
-    direction = random.randint(0, 3)
-    if direction == 0:
-        x += 1
-    elif direction == 1:
-        x -= 1
-    elif direction == 2:
-        y -= 1
-    else:
-        y += 1
-    return (x, y)
 
 common.safe_plot(draw_random_walk)

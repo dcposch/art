@@ -6,19 +6,15 @@
 
 - Get an [axidraw](https://axidraw.com/). They're super fun and easy to use.
 - Follow the [quick start guide](https://wiki.evilmadscientist.com/AxiDraw).
-- Once you've made your first test print, switch to advanced mode... clone this repo, then run:
+- Once you've made your first test print, switch to advanced mode... clone this repo, then install the Axidraw library.
+  
+  ```
+  pip3 install pyaxidraw
+  ```
 
-```
-pip3 install pyaxidraw
-```
+You can now run any of the prints. For example, try `python3 random-hex.py`.
 
-You can now run any of the prints.
-
-```
-python3 random-hex.py
-```
-
-The plotter will do a random walk. Each print is a surprise. For results like the photo above, run it once, switch pen colors, then run it again. Play with the parameters.
+The plotter will do a random walk. Each print is a surprise. For results like the photo above, run it once, switch pens, then run it again. Play with the parameters.
 
 You can use Dall-E with prompts like "a twirling ballerina, one-line art" or "line drawing", then use Inkscape's built-in Trace Bitmap tool to get a printable SVG.
 

@@ -2,6 +2,7 @@ from re import S
 from pyaxidraw import axidraw
 import math
 import random
+import common
 
 ad = axidraw.AxiDraw()
 ad.interactive()

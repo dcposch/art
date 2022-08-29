@@ -33,3 +33,10 @@ def safe_plot(draw_func):
     ad.options.mode = "manual"
     ad.options.manual_cmd = "disable_xy"
     ad.plot_run()
+
+def lineto_or_moveto(ad, x, y):
+    if ad.pen.status.pen_up:
+        ad.moveto(x, y)
+        ad.pendown()
+    else:
+        ad.lineto(x, y)

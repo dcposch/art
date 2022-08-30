@@ -58,8 +58,8 @@ def draw_random_walk(ad):
 def loc_in(x, y):
     """Given x and y in grid coordinates, returns a location in inches."""
     return [
-        bx[0] + margin[0] + step*x,
-        by[0] + margin[1] + step*y
+        bx[0] + step*x,
+        by[0] + step*y
     ]
 
 

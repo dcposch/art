@@ -3,7 +3,7 @@ import collections
 import common
 
 # Bounds for letter paper, in inches
-margin = [0.5, 0.5]
+margin = [0.6, 0.6]
 bx = [margin[0], 12-margin[0]]
 by = [margin[1], 9-margin[1]]
 
@@ -55,6 +55,7 @@ def draw_random_walk(ad):
         successfully_jumped = False
         if not successfully_stepped:
             best_dist_2 = 1e99
+            best_x, best_y = x, y
             for j in range(-20, 20, 1):
                 for k in range(-20, 20, 1):
                     nx, ny = x+j, y+k
@@ -65,8 +66,11 @@ def draw_random_walk(ad):
                     dist_2 = (nx - x)**2 + (ny - y)**2
                     if dist_2 < best_dist_2:
                         best_dist_2 = dist_2
-                        x, y = nx, ny
+                        best_x, best_y = nx, ny
                         successfully_jumped = True
+            if successfully_jumped:
+                print("Jumping from %d,%d to %d,%d" % (x, y, best_x, best_y))
+                x, y = best_x, best_y
 
         if not successfully_stepped and not successfully_jumped:
             print("Stuck, exiting")
@@ -81,8 +85,8 @@ def draw_random_walk(ad):
 def loc_in(x, y):
     """Given x and y in grid coordinates, returns a location in inches."""
     return [
-        bx[0] + margin[0] + step*x,
-        by[0] + margin[1] + step*y
+        bx[0] + step*x,
+        by[0] + step*y
     ]
 
 

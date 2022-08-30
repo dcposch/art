@@ -29,8 +29,8 @@ def loc_in(x, y):
     if y % 2 > 0:
         x += 0.5
     return [
-        bx[0] + margin[0] + step_x*x,
-        by[0] + margin[1] + step_y*y
+        bx[0] + step_x*x,
+        by[0] + step_y*y
     ]
 
 

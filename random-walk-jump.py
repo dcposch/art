@@ -34,23 +34,46 @@ def draw_random_walk(ad):
         if i % 100 == 0:
             print("Completed %d / %d, currently at %d %d" % (i, n, x, y))
 
-        while True:
+        successfully_stepped = False
+        for j in range(40):
             nx, ny = move_rand(x, y)
 
             # Check bounds, don't go off paper
             if nx < 0 or ny < 0 or nx >= w or ny >= h:
                 continue
 
-            # Make it less likely we revisit a location
-            n_visit = visit_count[(nx, ny)]
-            if random.random() > 2**(-n_visit):
-                continue  # never if n_visit is 0, 50% if 1, 75% if 2, etc
+            # Never revisit a location
+            if visit_count[(nx, ny)] > 0:
+                continue
 
             # Done, this is the next location
             x, y = nx, ny
-            visit_count[(x, y)] += 1
+            successfully_stepped = True
             break
 
+        # If we couldn't step, then jump
+        successfully_jumped = False
+        if not successfully_stepped:
+            best_dist_2 = 1e99
+            for j in range(-20, 20, 1):
+                for k in range(-20, 20, 1):
+                    nx, ny = x+j, y+k
+                    if nx < 0 or ny < 0 or nx >= w or ny >= h:
+                        continue
+                    if visit_count[(nx, ny)] > 0:
+                        continue
+                    dist_2 = (nx - x)**2 + (ny - y)**2
+                    if dist_2 < best_dist_2:
+                        best_dist_2 = dist_2
+                        x, y = nx, ny
+                        successfully_jumped = True
+
+        if not successfully_stepped and not successfully_jumped:
+            print("Stuck, exiting")
+            break
+
+        # Move to the next location
+        visit_count[(x, y)] += 1
         l = loc_in(x, y)
         ad.lineto(l[0], l[1])
 

@@ -1,7 +1,4 @@
-from pyaxidraw import axidraw
 import math
-import random
-import collections
 import common
 
 # Bounds for letter paper, in inches
@@ -22,6 +19,7 @@ wobble_max_in = 0.15
 wobbles_per_in = 4
 num_revs = 8
 
+
 def draw_spiral(ad):
     for i in range(math.floor(num_revs * 2 * math.pi / step_rad)):
         # Main spiral
@@ -38,5 +36,6 @@ def draw_spiral(ad):
         y += math.sin(theta) * wobble
 
         common.lineto_or_moveto(ad, x, y)
+
 
 common.safe_plot(draw_spiral)

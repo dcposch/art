@@ -2,32 +2,25 @@ import random
 import collections
 import common
 
-# Bounds for letter paper, in inches
-margin = [0.6, 0.6]
-bx = [margin[0], 12-margin[0]]
-by = [margin[1], 9-margin[1]]
 
-# Random walk step size
-step = 0.1
-w = (bx[1]-bx[0])/step
-h = (by[1]-by[0])/step
+def draw_random_walk(ad, bounds, step):
+    w = (bounds.x[1]-bounds.x[0])/step
+    h = (bounds.y[1]-bounds.y[0])/step
 
-
-def draw_random_walk(ad):
     # Initial location
-    x = w / 4
-    y = h / 2
+    x = w // 2
+    y = h // 2
 
     # Number of steps
-    n = 4000
+    n = int(w * h * 2 // 3)
 
     print("Plotting a random walk, %d steps, step size %r in" % (n, step))
     visit_count = collections.defaultdict(lambda: 0)
     visit_count[(x, y)] = 1
 
-    init_in = loc_in(x, y)
     ad.penup()
-    ad.moveto(init_in[0], init_in[1])
+    l0 = bounds.loc(step*x, step*y)
+    ad.moveto(l0[0], l0[1])
 
     # Plot
     for i in range(n):
@@ -39,7 +32,7 @@ def draw_random_walk(ad):
             nx, ny = move_rand(x, y)
 
             # Check bounds, don't go off paper
-            if nx < 0 or ny < 0 or nx >= w or ny >= h:
+            if nx < 0 or ny < 0 or nx > w or ny > h:
                 continue
 
             # Never revisit a location
@@ -54,23 +47,22 @@ def draw_random_walk(ad):
         # If we couldn't step, then jump
         successfully_jumped = False
         if not successfully_stepped:
-            best_dist_2 = 1e99
-            best_x, best_y = x, y
-            for j in range(-20, 20, 1):
-                for k in range(-20, 20, 1):
-                    nx, ny = x+j, y+k
-                    if nx < 0 or ny < 0 or nx >= w or ny >= h:
+            for j in range(100):
+                if successfully_jumped:
+                    break
+                for k in range(4):
+                    xd = (k % 2) * 2 - 1
+                    yd = (k // 2) * 2-1
+                    nx, ny = x+j*xd, y+j*yd
+                    if nx < 0 or ny < 0 or nx > w or ny > h:
                         continue
                     if visit_count[(nx, ny)] > 0:
                         continue
-                    dist_2 = (nx - x)**2 + (ny - y)**2
-                    if dist_2 < best_dist_2:
-                        best_dist_2 = dist_2
-                        best_x, best_y = nx, ny
-                        successfully_jumped = True
-            if successfully_jumped:
-                print("Jumping from %d,%d to %d,%d" % (x, y, best_x, best_y))
-                x, y = best_x, best_y
+                    print("Jumping from %d,%d to %d,%d" %
+                          (x, y, nx, ny))
+                    x, y = nx, ny
+                    successfully_jumped = True
+                    break
 
         if not successfully_stepped and not successfully_jumped:
             print("Stuck, exiting")
@@ -78,16 +70,8 @@ def draw_random_walk(ad):
 
         # Move to the next location
         visit_count[(x, y)] += 1
-        l = loc_in(x, y)
+        l = bounds.loc(step*x, step*y)
         ad.lineto(l[0], l[1])
-
-
-def loc_in(x, y):
-    """Given x and y in grid coordinates, returns a location in inches."""
-    return [
-        bx[0] + step*x,
-        by[0] + step*y
-    ]
 
 
 def move_rand(x, y):
@@ -103,4 +87,11 @@ def move_rand(x, y):
     return (x, y)
 
 
-common.safe_plot(draw_random_walk)
+def main(ad):
+    margin = 0.6
+    draw_random_walk(ad, common.Bounds(
+        [margin, 12-margin], [margin, 9-margin]),  0.1)
+
+
+if __name__ == "__main__":
+    common.safe_plot(main)

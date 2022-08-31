@@ -1,3 +1,4 @@
+import math
 import random
 import collections
 import common
@@ -9,17 +10,16 @@ by = [margin[1], 9-margin[1]]
 
 # Random walk step size
 step = 0.1
-w = (bx[1]-bx[0])/step
-h = (by[1]-by[0])/step
+w2 = (bx[1]-bx[0])/step/2  # half width, in steps
+h2 = (by[1]-by[0])/step/2  # half height
 
 
 def draw_random_walk(ad):
-    # Initial location
-    x = w / 4
-    y = h / 2
+    # Initial location = center of page.
+    x, y = 0, 0
 
     # Number of steps
-    n = 4000
+    n = 5000
 
     print("Plotting a random walk, %d steps, step size %r in" % (n, step))
     visit_count = collections.defaultdict(lambda: 0)
@@ -38,13 +38,20 @@ def draw_random_walk(ad):
             nx, ny = move_rand(x, y)
 
             # Check bounds, don't go off paper
-            if nx < 0 or ny < 0 or nx >= w or ny >= h:
+            if nx < -w2 or ny < -h2 or nx >= w2 or ny >= h2:
                 continue
 
             # Make it less likely we revisit a location
             n_visit = visit_count[(nx, ny)]
             if random.random() > 2**(-n_visit):
                 continue  # never if n_visit is 0, 50% if 1, 75% if 2, etc
+
+            # Less likely to walk backwards
+            # At loc (x, y), the forward direction is (y, -x)
+            fx, fy = y, -x
+            dot = ((nx - x) * fx + (ny - y) * fy) / math.sqrt(fx**2+fy**2+9)
+            if random.random() > (dot*0.25 + 0.75):
+                continue
 
             # Done, this is the next location
             x, y = nx, ny
@@ -58,8 +65,8 @@ def draw_random_walk(ad):
 def loc_in(x, y):
     """Given x and y in grid coordinates, returns a location in inches."""
     return [
-        bx[0] + step*x,
-        by[0] + step*y
+        bx[0] + step*(x + w2),
+        by[0] + step*(y + h2)
     ]
 
 
@@ -76,4 +83,5 @@ def move_rand(x, y):
     return (x, y)
 
 
-common.safe_plot(draw_random_walk)
+if __name__ == "__main__":
+    common.safe_plot(draw_random_walk)

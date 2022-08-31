@@ -47,4 +47,5 @@ def wobble_func(x, y):
     return ((math.sin(y * 2 + y**2 / 20 + x**2 / 60) + 1) / 2)**2
 
 
-common.safe_plot(draw_spiral)
+if __name__ == "__main__":
+    common.safe_plot(draw_spiral)

@@ -36,4 +36,5 @@ def draw_lissajous(ad):
     print("Done")
 
 
-common.safe_plot(draw_lissajous)
+if __name__ == "__main__":
+    common.safe_plot(draw_lissajous)

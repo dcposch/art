@@ -56,11 +56,11 @@ def move_rand(x, y):
 
 def draw_random_walk(ad):
     # Initial location
-    x = w / 4
-    y = h / 2
+    x = math.floor(w / 4) + 3
+    y = math.floor(h / 2)
 
     # Number of steps
-    n = 5000
+    n = 9000
 
     print("Plotting a random walk, %d steps, step size %r in" % (n, step_x))
     visit_count = collections.defaultdict(lambda: 0)
@@ -96,4 +96,5 @@ def draw_random_walk(ad):
         ad.lineto(l[0], l[1])
 
 
-common.safe_plot(draw_random_walk)
+if __name__ == "__main__":
+    common.safe_plot(draw_random_walk)

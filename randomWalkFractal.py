@@ -1,4 +1,4 @@
-import randomWalkJump
+import randomWalkNoTouch
 import frame
 import common
 
@@ -6,7 +6,7 @@ import common
 def rw(ad, b):
     frame.draw_frame(ad, b)
     step = 0.1
-    randomWalkJump.draw_random_walk(ad, b.inset(step), step)
+    randomWalkNoTouch.draw_random_walk(ad, b.inset(step), step)
 
 
 def main(ad):

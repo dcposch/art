@@ -11,6 +11,12 @@ class Bounds:
         self.w = x[1]-x[0]
         self.h = y[1]-y[0]
 
+    def __str__(self) -> str:
+        return "[x:%r y:%r]" % (self.x, self.y)
+
+    def __repr__(self) -> str:
+        return self.__str__()
+
     def inset(self, l):
         x = self.x
         y = self.y
@@ -20,6 +26,13 @@ class Bounds:
         ret = [x + self.x[0], y + self.y[0]]
         if x < 0 or y < 0 or ret[0] > self.x[1] or ret[1] > self.y[1]:
             raise Exception("%r out of bounds x%r y%r" % (ret, self.x, self.y))
+        return ret
+
+    def sub_bounds(self, x0, x1, y0, y1):
+        ret = Bounds([self.x[0]+x0, self.x[0]+x1],
+                     [self.y[0]+y0, self.y[0]+y1])
+        if x0 < 0 or y0 < 0 or ret.x[1] > self.x[1] or ret.y[1] > self.y[1]:
+            raise Exception("%r out of bounds %r" % (ret, self))
         return ret
 
 

@@ -14,13 +14,12 @@ def draw_pixels(ad, bounds, px, gap, func):
             if val == 0:
                 continue
 
-            print("Retarded. %d %d %d %d" % (i, j, pg, px))
             box = bounds.sub_bounds(i*pg, i*pg + px, j*pg, j*pg + px)
             draw_frame(ad, box)
             if val == 1:
                 continue
             if val != 2:
-                raise Exception("Invalid bitmap val %r at %d %d" % (val, i, j))
+                raise Exception("Invalid bitmap %r at %d %d" % (val, i, j))
 
             # Lawnmower pattern fill
             pitch = 0.02

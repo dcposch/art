@@ -12,7 +12,7 @@
   pip3 install pyaxidraw
   ```
 
-You can now run any of the prints. For example, try `python3 randomWalkHex.py`.
+You can now run any of the prints. For example, try `python3 random_walk.py`.
 
 The plotter will do a random walk. Each print is a surprise. For results like the photo above, run it once, switch pens, then run it again. Play with the parameters.
 

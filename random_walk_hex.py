@@ -1,18 +1,7 @@
 import math
-import random
-import collections
+from random import random, randint
 import common
 
-# Bounds for letter paper, in inches
-margin = [0.5, 0.5]
-bx = [margin[0], 12-margin[0]]
-by = [margin[1], 9-margin[1]]
-
-# Random walk step size
-step_x = 0.1
-step_y = step_x * math.sqrt(3) / 2
-w = math.floor((bx[1]-bx[0])/step_x)
-h = math.floor((by[1]-by[0])/step_y)
 
 # Hex coordinates
 #
@@ -24,16 +13,6 @@ h = math.floor((by[1]-by[0])/step_y)
 #
 
 
-def loc_in(x, y):
-    """Given x and y in hex coordinates, returns a location in inches."""
-    if y % 2 > 0:
-        x += 0.5
-    return [
-        bx[0] + step_x*x,
-        by[0] + step_y*y
-    ]
-
-
 def move_rand(x, y):
     xn = x % 6
     yn = y % 2
@@ -42,7 +21,7 @@ def move_rand(x, y):
     if case not in [0, 1, 3, 4]:
         raise Exception("%d %d not hex" % (x, y))
 
-    direction = random.randint(0, 2)
+    direction = randint(0, 2)
     if direction == 0:
         x += 1 if case in [0, 3] else -1
     else:
@@ -54,28 +33,55 @@ def move_rand(x, y):
     return (x, y)
 
 
-def draw_random_walk(ad):
-    # Initial location
-    x = math.floor(w / 4) + 3
-    y = math.floor(h / 2)
+def is_hex(x, y):
+    xn = x % 6
+    yn = y % 2
+    case = xn - yn
+    return case in [0, 1, 3, 4]
+
+
+def draw_random_walk(ad, bounds, step_x):
+    # Random walk step size
+    step_y = step_x * math.sqrt(3) / 2
+    w = math.floor(bounds.w/step_x)
+    h = math.floor(bounds.h/step_y)
+
+    def loc_in(x, y):
+        """Given x and y in hex coordinates, returns a location in inches."""
+        if y % 2 > 0:
+            x += 0.5
+        return bounds.loc(x*step_x, y*step_y)
+
+    visited = set()
+
+    def pick_rand_unvisited():
+        while True:
+            p = (int(random() * w), int(random() * h))
+            if is_hex(p[0], p[1]) and p not in visited:
+                return p
 
     # Number of steps
-    n = 9000
-
+    n = int(w * h * 0.4)
     print("Plotting a random walk, %d steps, step size %r in" % (n, step_x))
-    visit_count = collections.defaultdict(lambda: 0)
-    visit_count[(x, y)] = 1
 
-    init_in = loc_in(x, y)
-    ad.penup()
-    ad.moveto(init_in[0], init_in[1])
+    def jump():
+        nx, ny = pick_rand_unvisited()
+        visited.add((nx, ny))
+        nin = loc_in(nx, ny)
+        ad.penup()
+        ad.moveto(nin[0], nin[1])
+        return nx, ny
+
+    # Initial location
+    x, y = jump()
 
     # Plot
     for i in range(n):
         if i % 100 == 0:
             print("Completed %d / %d, currently at %d %d" % (i, n, x, y))
 
-        while True:
+        moved = False
+        for _ in range(20):
             nx, ny = move_rand(x, y)
 
             # Check bounds, don't go off paper
@@ -83,18 +89,31 @@ def draw_random_walk(ad):
                 continue
 
             # Make it less likely we revisit a location
-            n_visit = visit_count[(nx, ny)]
-            if random.random() > 2**(-n_visit):
-                continue  # never if n_visit is 0, 50% if 1, 75% if 2, etc
+            if (nx, ny) in visited:
+                continue
 
             # Done, this is the next location
             x, y = nx, ny
-            visit_count[(x, y)] += 1
+            visited.add((x, y))
+            moved = True
             break
+
+        if not moved:
+            print("Stuck, jumping")
+            x, y = jump()
 
         l = loc_in(x, y)
         ad.lineto(l[0], l[1])
 
 
+def main(ad):
+    step = 0.08
+    margin = 0.5
+    w, h = 12, 8.9
+    b = common.Bounds(
+        [margin, w-margin], [margin, h-margin])
+    draw_random_walk(ad, b, step)
+
+
 if __name__ == "__main__":
-    common.safe_plot(draw_random_walk)
+    common.safe_plot(main)

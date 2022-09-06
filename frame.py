@@ -12,8 +12,9 @@ def draw_frame(ad, bounds):
 
 
 def main(ad):
-    margin = 0.5
-    draw_frame(ad, common.Bounds([margin, 12-margin], [margin, 9-margin]))
+    w, h = 12, 8.9
+    margin = 0.4
+    draw_frame(ad, common.Bounds([margin, w-margin], [margin, h-margin]))
 
 
 if __name__ == "__main__":

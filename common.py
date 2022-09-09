@@ -22,6 +22,11 @@ class Bounds:
         y = self.y
         return Bounds([x[0]+l, x[1]-l], [y[0]+l, y[1]-l])
 
+    def offset(self, a, b):
+        x = self.x
+        y = self.y
+        return Bounds([x[0]+a, x[1]+a], [y[0]+b, y[1]+b])
+
     def loc(self, x, y):
         ret = [x + self.x[0], y + self.y[0]]
         if x < 0 or y < 0 or ret[0] > self.x[1] or ret[1] > self.y[1]:

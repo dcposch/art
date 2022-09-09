@@ -10,8 +10,8 @@ def draw_random_walk(ad, bounds, step):
     h = int((bounds.y[1]-bounds.y[0])//step)
 
     # Initial location
-    x = w // 2
-    y = h // 2
+    x = int(w * random.random())
+    y = int(h * random.random())
 
     # Number of steps
     n = (w+1) * (h+1) * 1 // 2
@@ -23,6 +23,7 @@ def draw_random_walk(ad, bounds, step):
     # Approximate with a flood-fill heuristic and recursion.
     curve = []
     visited = set()
+    ad.penup()
     assert gen_rand_fill(w//2, h//2, w, h, curve, visited, n)
     print("Generated a random space-filling curve of length %d" % len(curve))
 

@@ -111,7 +111,7 @@ def main(ad):
     margin = 0.5
     w, h = 12, 8.9
     b = common.Bounds(
-        [margin, w-margin], [margin, h-margin])
+        [margin, w-margin-7], [margin+3, h-margin])
     draw_random_walk(ad, b, step)
 
 

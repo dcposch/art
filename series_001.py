@@ -17,12 +17,17 @@ def rw(ad, b, type):
 
 
 def main(ad):
+    seed = int(input("Enter random seed: "))
+    random.seed(seed)
+
     w, h, m = 12, 8.9, 0.5  # paper dimensions and margin, in inches
     b = common.Bounds([m, w-m], [m, h-m])
 
     g = 0.1  # gap, inches
     bounds = []
-    for _ in range(8):
+    n_boxes = int(6 + 4*random.random())
+    print("Drawing %d nested random walks" % n_boxes)
+    for _ in range(n_boxes):
         split = 0.25 + random.random() * 0.5
         if b.w > b.h:
             split_x = b.x[0] + b.w*split

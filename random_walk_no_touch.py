@@ -61,7 +61,7 @@ def gen_rand_fill(x, y, w, h, curve, visited, n):
     # Limit recursive branching to allow deep backtrackings
     if len(valid_next_locs) > 1:
         max_rec = 1
-        if random.random() < 8/(n+10):
+        if random.random() < 10/(n+10):
             max_rec = 2
         valid_next_locs = valid_next_locs[:max_rec]
 

@@ -16,13 +16,9 @@ def rw(ad, b, type):
     frame.draw_frame(ad, b)
 
 
-def main(ad):
-    seed = int(input("Enter random seed: "))
-    random.seed(seed)
-
+def draw(ad):
     w, h, m = 12, 8.9, 0.5  # paper dimensions and margin, in inches
     b = common.Bounds([m, w-m], [m, h-m])
-
     g = 0.1  # gap, inches
     bounds = []
     n_boxes = int(6 + 4*random.random())
@@ -58,5 +54,16 @@ def main(ad):
     print("Done")
 
 
+def main():
+    min_seed = int(input("Enter min seed: "))
+    max_seed = int(input("Enter max seed: "))
+    for seed in range(min_seed, max_seed + 1):
+        print("")
+        input("Ready for seed %d, hit enter to continue..." % seed)
+        print("DRAWING SEED %d" % seed)
+        random.seed(seed)
+        common.safe_plot(draw)
+
+
 if __name__ == "__main__":
-    common.safe_plot(main)
+    main()

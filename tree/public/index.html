@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Plotter SVG</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font: 1em system-ui;
+      }
+      a,
+      a:visited {
+        color: inherit;
+        text-decoration: none;
+      }
+      main {
+        margin: 1em auto;
+        width: max-content;
+      }
+      form {
+        margin: 1em 0;
+      }
+      svg {
+        border: 1px solid #888;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>hello world</h1>
+      <form>
+        <a id="dl" href="#">Download</a>
+      </form>
+      <svg width="600" height="450"></svg>
+    </main>
+    <script src="./src/index.ts" async type="module"></script>
+  </body>
+</html>

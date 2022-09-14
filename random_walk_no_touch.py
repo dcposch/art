@@ -24,7 +24,8 @@ def draw_random_walk(ad, bounds, step):
     curve = []
     visited = set()
     ad.penup()
-    assert gen_rand_fill(w//2, h//2, w, h, curve, visited, n)
+    if not gen_rand_fill(w//2, h//2, w, h, curve, visited, n):
+        print("Skipping, failed to generate walk")
     print("Generated a random space-filling curve of length %d" % len(curve))
 
     for i, point in enumerate(curve):

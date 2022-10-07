@@ -1,11 +1,15 @@
+from time import sleep
 from pyaxidraw import axidraw
 import traceback
+import typing
+import random
+import numpy as np
 
 
 class Bounds:
     """Contains x [min, max] and y [min, max] in inches."""
 
-    def __init__(self, x, y):
+    def __init__(self, x: tuple[float, float], y: tuple[float, float]):
         self.x = [x[0], x[1]]
         self.y = [y[0], y[1]]
         self.w = x[1]-x[0]
@@ -27,10 +31,16 @@ class Bounds:
         y = self.y
         return Bounds([x[0]+a, x[1]+a], [y[0]+b, y[1]+b])
 
-    def loc(self, x, y):
-        ret = [x + self.x[0], y + self.y[0]]
+    def loc(self, x, y) -> tuple[float, float]:
+        """Given a relative point in inches, returns a absolute point."""
+        ret = (x + self.x[0], y + self.y[0])
         if x < 0 or y < 0 or ret[0] > self.x[1] or ret[1] > self.y[1]:
             raise Exception("%r out of bounds x%r y%r" % (ret, self.x, self.y))
+        return ret
+
+    def abs_to_01(self, loc) -> tuple[float, float]:
+        """Given an absolute point in inches, returns a point in [0,1]^2 if in-bounds."""
+        ret = ((loc[0]-self.x[0])/self.w, (loc[1]-self.y[0])/self.h)
         return ret
 
     def sub_bounds(self, x0, x1, y0, y1):
@@ -41,32 +51,41 @@ class Bounds:
         return ret
 
 
-def safe_plot(draw_func):
+def default_init(ad: axidraw.AxiDraw):
+    ad.options.pen_pos_down = 10
+    ad.options.pen_pos_up = 50
+    ad.options.const_speed = True
+
+
+def safe_plot(draw_func: typing.Callable[[axidraw.AxiDraw], None], init_func=default_init):
+    """Plots something on an AxiDraw, catching errors to return to a power-off state."""
     # Set up
     print("Connecting to plotter...")
     ad = axidraw.AxiDraw()
     ad.interactive()
-    ad.options.pen_pos_down = 10
-    ad.options.pen_pos_up = 50
-    ad.options.const_speed = True
-    ad.connect()
+    init_func(ad)
+    assert ad.connect()
     ad.penup()
 
     # Draw
     try:
         draw_func(ad)
+        print("Going home...")
+        ad.penup()
+        ad.moveto(0, 0)
+        disconnect_motors_off(ad)
     except Exception as e:
         print(traceback.format_exc())
         print(e)
     except KeyboardInterrupt:
         print("Interrupted, stopping...")
+        ad.penup()
+        sleep(0.1)
+        ad.penup()
+        disconnect_motors_off(ad)
 
-    # Move home
-    print("Returning to home...")
-    ad.penup()
-    ad.moveto(0, 0)
 
-    # Done, turn off
+def disconnect_motors_off(ad: axidraw.AxiDraw):
     print("Exiting, shutting off motors...")
     ad.disconnect()
     ad.plot_setup()
@@ -75,7 +94,20 @@ def safe_plot(draw_func):
     ad.plot_run()
 
 
-def lineto_or_moveto(ad, x, y):
+def safe_plot_seeds(draw_func: typing.Callable[[axidraw.AxiDraw], None], init_func=default_init):
+    """Calls safe_plot multiple times, for a range of user-specified random seeds."""
+    min_seed = int(input("Enter min seed: "))
+    max_seed = int(input("Enter max seed: "))
+    for seed in range(min_seed, max_seed + 1):
+        print("")
+        input("Ready for seed %d, hit enter to continue..." % seed)
+        print("DRAWING SEED %d" % seed)
+        random.seed(seed)
+        np.random.seed(seed)
+        safe_plot(draw_func, init_func)
+
+
+def lineto_or_moveto(ad: axidraw.AxiDraw, x: float, y: float):
     if ad.pen.status.pen_up:
         ad.moveto(x, y)
         ad.pendown()

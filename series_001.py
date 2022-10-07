@@ -55,14 +55,7 @@ def draw(ad):
 
 
 def main():
-    min_seed = int(input("Enter min seed: "))
-    max_seed = int(input("Enter max seed: "))
-    for seed in range(min_seed, max_seed + 1):
-        print("")
-        input("Ready for seed %d, hit enter to continue..." % seed)
-        print("DRAWING SEED %d" % seed)
-        random.seed(seed)
-        common.safe_plot(draw)
+    common.safe_plot_seeds(draw)
 
 
 if __name__ == "__main__":

@@ -12,10 +12,10 @@ def draw_pen(ad: axidraw.AxiDraw):
     dim = 18  # in inches
     border = 0.5  # inches
     b = common.Bounds([border, dim-border], [border, dim-border])
-    wp, hp = 81*3, 81*3  # in pixels
-    dx, dy = b.w/wp, b.h/hp  # inches per pixel
+    pix = 81  # in pixels
+    dx, dy = b.w/pix, b.h/pix  # inches per pixel
     dry_run = False
-    for i in range(wp):
+    for i in range(pix):
         str = ""
         x = i * dx
 
@@ -24,8 +24,8 @@ def draw_pen(ad: axidraw.AxiDraw):
             common.movep(ad, b.loc(x, 0))
             common.linep(ad, b.loc(x, b.h))
         else:
-            for j2 in range(hp):
-                j = hp - j2 - 1 if i % 2 == 1 else j2
+            for j2 in range(pix):
+                j = pix - j2 - 1 if i % 2 == 1 else j2
                 pixel = 'o' if im[j][i] > 0 else ' '
                 str += pixel
                 if im[j][i] == 0:

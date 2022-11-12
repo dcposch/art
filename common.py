@@ -113,3 +113,12 @@ def lineto_or_moveto(ad: axidraw.AxiDraw, x: float, y: float):
         ad.pendown()
     else:
         ad.lineto(x, y)
+
+
+def movep(ad: axidraw.AxiDraw, point: tuple[float, float]):
+    ad.penup()  # work around a bug in the Axidraw library
+    ad.moveto(point[0], point[1])
+
+
+def linep(ad: axidraw.AxiDraw, point: tuple[float, float]):
+    ad.lineto(point[0], point[1])

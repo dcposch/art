@@ -9,11 +9,13 @@ import numpy as np
 class Bounds:
     """Contains x [min, max] and y [min, max] in inches."""
 
-    def __init__(self, x: tuple[float, float], y: tuple[float, float]):
+    def __init__(self, x: tuple[float, float], y: tuple[float, float], d: tuple[float, float] = (1, 1)):
         self.x = [x[0], x[1]]
         self.y = [y[0], y[1]]
         self.w = x[1]-x[0]
         self.h = y[1]-y[0]
+        self.dx = d[0]
+        self.dy = d[1]
 
     def __str__(self) -> str:
         return "[x:%r y:%r]" % (self.x, self.y)
@@ -32,10 +34,10 @@ class Bounds:
         return Bounds([x[0]+a, x[1]+a], [y[0]+b, y[1]+b])
 
     def loc(self, x, y) -> tuple[float, float]:
-        """Given a relative point in inches, returns a absolute point."""
-        ret = (x + self.x[0], y + self.y[0])
-        if x < 0 or y < 0 or ret[0] > self.x[1] or ret[1] > self.y[1]:
-            raise Exception("%r out of bounds x%r y%r" % (ret, self.x, self.y))
+        """Given a relative point, returns a absolute point in inches."""
+        ret = (x * self.dx + self.x[0], y * self.dy + self.y[0])
+        # if x < 0 or y < 0 or ret[0] > self.x[1] or ret[1] > self.y[1]:
+        #     raise Exception("%r out of bounds x%r y%r" % (ret, self.x, self.y))
         return ret
 
     def abs_to_01(self, loc) -> tuple[float, float]:
@@ -113,6 +115,10 @@ def lineto_or_moveto(ad: axidraw.AxiDraw, x: float, y: float):
         ad.pendown()
     else:
         ad.lineto(x, y)
+
+
+def line_or_movep(ad: axidraw.AxiDraw, point: tuple[float, float]):
+    lineto_or_moveto(ad, point[0], point[1])
 
 
 def movep(ad: axidraw.AxiDraw, point: tuple[float, float]):

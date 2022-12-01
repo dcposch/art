@@ -35,7 +35,7 @@ def draw_spiral(ad):
         x += math.cos(theta) * wobble
         y += math.sin(theta) * wobble
 
-        common.lineto_or_moveto(ad, x, y)
+        common.line_or_movep(ad, (x, y))
 
 
 def wobble_func(x, y):

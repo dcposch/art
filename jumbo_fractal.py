@@ -26,9 +26,6 @@ def draw(ad):
     bounds = []
     subdivide(b, g, max_a, bounds)
 
-    # Skip most boxes for paint-over
-    skip = True
-
     print("Drawing jumbo nested random walks")
     types = list(map(lambda _: int(random.random() * 2), bounds))
     is_skipping = True

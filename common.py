@@ -109,22 +109,40 @@ def safe_plot_seeds(draw_func: typing.Callable[[axidraw.AxiDraw], None], init_fu
         safe_plot(draw_func, init_func)
 
 
-def lineto_or_moveto(ad: axidraw.AxiDraw, x: float, y: float):
+def line_or_movep(ad: axidraw.AxiDraw, point: tuple[float, float]):
+    if should_skip():
+        return
     if ad.pen.status.pen_up:
-        ad.moveto(x, y)
+        movep(ad, point)
         ad.pendown()
     else:
-        ad.lineto(x, y)
-
-
-def line_or_movep(ad: axidraw.AxiDraw, point: tuple[float, float]):
-    lineto_or_moveto(ad, point[0], point[1])
+        linep(ad, point)
 
 
 def movep(ad: axidraw.AxiDraw, point: tuple[float, float]):
+    if should_skip():
+        return
     ad.penup()  # work around a bug in the Axidraw library
     ad.moveto(point[0], point[1])
 
 
 def linep(ad: axidraw.AxiDraw, point: tuple[float, float]):
+    if should_skip():
+        return
     ad.lineto(point[0], point[1])
+
+
+moves_to_skip = 0
+
+
+def should_skip():
+    global moves_to_skip
+    if moves_to_skip > 0:
+        moves_to_skip -= 1
+        return True
+    return False
+
+
+def skip(n: int):
+    global moves_to_skip
+    moves_to_skip = n

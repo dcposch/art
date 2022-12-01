@@ -101,13 +101,13 @@ def draw_circle(ad: axidraw.AxiDraw, r: float, c: tuple[float, float], b: common
         x = c[0] + r * math.cos(2 * math.pi * i / n)
         y = c[1] + r * math.sin(2 * math.pi * i / n)
         l = b.loc(x, y)
-        common.lineto_or_moveto(ad, l[0], l[1])
+        common.line_or_movep(ad, l)
 
 
 def init(ad: axidraw.AxiDraw):
-    ad.options.pen_pos_down = 40
-    ad.options.pen_pos_up = 66
-    ad.options.pen_down_speed = 40
+    ad.options.pen_pos_down = 50  # 45
+    ad.options.pen_pos_up = 90  # 55
+    ad.options.pen_down_speed = 30
     ad.options.pen_up_speed = 90
     ad.options.const_speed = True
     ad.options.model = 5  # SE A1 jumbo plotter
@@ -122,6 +122,9 @@ if __name__ == "__main__":
                         help='Fractal depth d, 3**d px across')
     parser.add_argument(
         'style', choices=['circles', 'points', 'squares', 'squiggle', 'strokes'])
+    parser.add_argument(
+        'skip', type=int, default=0, help='Moves to skip', nargs='?')
     args = parser.parse_args()
+    common.skip(args.skip)
     common.safe_plot(lambda ad: draw(ad, args.xo, args.yo,
                      args.dim, args.depth, args.style), init)

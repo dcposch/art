@@ -3,12 +3,12 @@ from pyaxidraw import axidraw
 import argparse
 
 
-def draw(ad: axidraw.AxiDraw, xo: float, yo: float, w: float, h: float):
-    common.movep(ad, [xo, yo])
-    common.linep(ad, [xo + 0*w, yo + 1*h])
-    common.linep(ad, [xo + 1*w, yo + 1*h])
-    common.linep(ad, [xo + 1*w, yo + 0*h])
-    common.linep(ad, [xo + 0*w, yo + 0*h])
+def draw(ad: axidraw.AxiDraw, b: common.Bounds):
+    common.movep(ad, b.loc(0, 0))
+    common.linep(ad, b.loc(0*b.w, 1*b.h))
+    common.linep(ad, b.loc(1*b.w, 1*b.h))
+    common.linep(ad, b.loc(1*b.w, 0*b.h))
+    common.linep(ad, b.loc(0*b.w, 0*b.h))
 
 
 def init(ad: axidraw.AxiDraw):
@@ -27,5 +27,7 @@ if __name__ == "__main__":
     parser.add_argument('w', type=float, help='Width in inches')
     parser.add_argument('h', type=float, help='Height in inches')
     args = parser.parse_args()
-    common.safe_plot(lambda ad: draw(
-        ad, args.xo, args.yo, args.w, args.h), init)
+
+    b = common.Bounds((args.xo, args.xo+args.w), (args.yo, args.yo+args.h))
+
+    common.safe_plot(lambda ad: draw(ad, b), init)

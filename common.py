@@ -23,7 +23,8 @@ class Bounds:
     def __repr__(self) -> str:
         return self.__str__()
 
-    def inset(self, l):
+    def inset(self, l: float):
+        """Returns a new bounds, inset from the current bounds by l inches."""
         x = self.x
         y = self.y
         return Bounds([x[0]+l, x[1]-l], [y[0]+l, y[1]-l])
@@ -53,10 +54,29 @@ class Bounds:
         return ret
 
 
+def create_grid(b: Bounds, nx: int, ny: int, gutter: float) -> list[Bounds]:
+    """Returns nx*ny bounds inset inside of b, separated by gutter in inches."""
+    ret = []
+    x, y = b.x[0], b.y[0]
+    sx, sy = (b.w-gutter)/nx, (b.h-gutter)/ny
+    for i in range(nx):
+        for j in range(ny):
+            ret.append(Bounds(
+                (x + sx*i + gutter, x + sx*(i+1)),
+                (y + sy*j + gutter, y + sy*(j+1))
+            ))
+    return ret
+
+
 def default_init(ad: axidraw.AxiDraw):
-    ad.options.pen_pos_down = 10
-    ad.options.pen_pos_up = 50
+    ad.options.pen_pos_down = 40
+    ad.options.pen_pos_up = 60
     ad.options.const_speed = True
+
+
+def wait(ad: axidraw.AxiDraw, msg: str = "Press enter to continue..."):
+    ad.penup()
+    input(msg)
 
 
 def safe_plot(draw_func: typing.Callable[[axidraw.AxiDraw], None], init_func=default_init):

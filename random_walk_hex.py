@@ -1,6 +1,7 @@
 import math
 from random import random, randint
 import common
+import argparse
 
 
 # Hex coordinates
@@ -61,7 +62,7 @@ def draw_random_walk(ad, bounds, step_x):
                 return p
 
     # Number of steps
-    n = int(w * h * 0.4)
+    n = int(w * h * 0.5)
     print("Plotting a random walk, %d steps, step size %r in" % (n, step_x))
 
     def jump():
@@ -106,14 +107,20 @@ def draw_random_walk(ad, bounds, step_x):
         ad.lineto(l[0], l[1])
 
 
-def main(ad):
-    step = 0.08
-    margin = 0.5
-    w, h = 12, 8.9
-    b = common.Bounds(
-        [margin, w-margin-7], [margin+3, h-margin])
-    draw_random_walk(ad, b, step)
-
-
 if __name__ == "__main__":
-    common.safe_plot(main)
+    parser = argparse.ArgumentParser('rect')
+    parser.add_argument('w', type=float, help='Width in inches')
+    parser.add_argument('h', type=float, help='Height in inches')
+    parser.add_argument(
+        's', type=float, help='Step len in inches', default=0.08, nargs='?')
+    parser.add_argument(
+        'm', type=float, help='Margin in inches', default=0.5, nargs='?')
+    args = parser.parse_args()
+
+    step = args.s
+    margin = args.m
+    w, h = args.w, args.h
+    b = common.Bounds(
+        [margin, w-margin], [margin, h-margin])
+
+    common.safe_plot(lambda ad: draw_random_walk(ad, b, step))

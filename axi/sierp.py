@@ -4,11 +4,28 @@ import math
 import argparse
 import random
 
+P = tuple[float, float]
+
+
+class WarpedBounds(common.Bounds):
+    def __init__(self, x: P, y: P, d: P):
+        common.Bounds.__init__(self, x, y, d)
+
+    def loc(self, x, y) -> tuple[float, float]:
+        xf = (x*self.dx)/self.w
+        yf = (y*self.dy)/self.h
+        yspread = yf*yf + yf + 1  # range 1-3
+
+        u, v = super().loc(x, y)  # in inches
+        v += ((xf * xf) * 0.5 + 0.15 * (math.cos(xf * 2 * math.pi) - 1))*yspread
+        u += (yf * yf) * 0.3
+        return (u, v)
+
 
 def draw(ad: axidraw.AxiDraw, xo: float, yo: float, dim: float, depth: int, style: str):
     pix = 3**depth  # in pixels
     dx = (dim)/pix  # inches per pixel
-    b = common.Bounds([xo, dim+xo], [yo, dim+yo], [dx, dx])
+    b = WarpedBounds([xo, dim+xo], [yo, dim+yo], [dx, dx])
     print("Drawing %dx%d sierpinski carpet at %r, %s" % (pix, pix, b, style))
     draw_rec(ad, 0, 0, b, depth, False, style, 0)
 
@@ -97,16 +114,22 @@ def draw_rec(ad: axidraw.AxiDraw, i0: int, j0: int, b: common.Bounds, depth: int
 def draw_circle(ad: axidraw.AxiDraw, r: float, c: tuple[float, float], b: common.Bounds):
     ad.penup()
     n = int(20*r + 1)
-    for i in range(n):
+    for i in range(n + 1):
         x = c[0] + r * math.cos(2 * math.pi * i / n)
         y = c[1] + r * math.sin(2 * math.pi * i / n)
         l = b.loc(x, y)
         common.line_or_movep(ad, l)
 
 
-def init(ad: axidraw.AxiDraw):
-    ad.options.pen_pos_down = 50  # 45
-    ad.options.pen_pos_up = 90  # 55
+def init(ad: axidraw.AxiDraw, style: str):
+    if style == 'strokes':
+        # Paint
+        ad.options.pen_pos_down = 30
+        ad.options.pen_pos_up = 70
+    else:
+        # Pen or marker
+        ad.options.pen_pos_down = 45
+        ad.options.pen_pos_up = 55
     ad.options.pen_down_speed = 30
     ad.options.pen_up_speed = 90
     ad.options.const_speed = True
@@ -127,4 +150,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     common.skip(args.skip)
     common.safe_plot(lambda ad: draw(ad, args.xo, args.yo,
-                     args.dim, args.depth, args.style), init)
+                     args.dim, args.depth, args.style),
+                     lambda ad: init(ad, args.style))

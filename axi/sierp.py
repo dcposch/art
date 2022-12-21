@@ -25,7 +25,8 @@ class WarpedBounds(common.Bounds):
 def draw(ad: axidraw.AxiDraw, xo: float, yo: float, dim: float, depth: int, style: str):
     pix = 3**depth  # in pixels
     dx = (dim)/pix  # inches per pixel
-    b = WarpedBounds([xo, dim+xo], [yo, dim+yo], [dx, dx])
+    # b = WarpedBounds([xo, dim+xo], [yo, dim+yo], [dx, dx])
+    b = common.Bounds((xo, dim+xo), (yo, dim+yo), (dx, dx))
     print("Drawing %dx%d sierpinski carpet at %r, %s" % (pix, pix, b, style))
     draw_rec(ad, 0, 0, b, depth, False, style, 0)
 
@@ -69,6 +70,13 @@ def draw_rec(ad: axidraw.AxiDraw, i0: int, j0: int, b: common.Bounds, depth: int
 
     if depth == 0 and black and style == 'squiggle':
         common.line_or_movep(ad, b.loc(float(i0)+0.5, float(j0)+0.5))
+
+    if depth == 0 and black and style == 'squiggler':
+        fx, fy = b.abs_to_01(b.loc(float(i0), float(j0)))
+        amp = math.sin(fx * fy * math.pi)
+        rx = (1-amp)/2 + random.random()*amp
+        ry = (1-amp)/2 + random.random()*amp
+        common.line_or_movep(ad, b.loc(float(i0)+rx, float(j0)+ry))
 
     if depth == 0 and black and style == 'squares':
         frac = 0.6
@@ -133,7 +141,7 @@ def init(ad: axidraw.AxiDraw, style: str):
     ad.options.pen_down_speed = 30
     ad.options.pen_up_speed = 90
     ad.options.const_speed = True
-    ad.options.model = 5  # SE A1 jumbo plotter
+    # ad.options.model = 5  # SE A1 jumbo plotter
 
 
 if __name__ == "__main__":
@@ -144,11 +152,13 @@ if __name__ == "__main__":
     parser.add_argument('depth', type=int,
                         help='Fractal depth d, 3**d px across')
     parser.add_argument(
-        'style', choices=['circles', 'points', 'squares', 'squiggle', 'strokes'])
+        'style', choices=['circles', 'points', 'squares', 'squiggle', 'squiggler', 'strokes'])
     parser.add_argument(
         'skip', type=int, default=0, help='Moves to skip', nargs='?')
+    parser.add_argument('--name', type=str, help='Device name', default='')
     args = parser.parse_args()
     common.skip(args.skip)
     common.safe_plot(lambda ad: draw(ad, args.xo, args.yo,
                      args.dim, args.depth, args.style),
-                     lambda ad: init(ad, args.style))
+                     lambda ad: init(ad, args.style),
+                     args.name)

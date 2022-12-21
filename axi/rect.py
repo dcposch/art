@@ -26,8 +26,9 @@ if __name__ == "__main__":
     parser.add_argument('yo', type=float, help='Top y, in inches')
     parser.add_argument('w', type=float, help='Width in inches')
     parser.add_argument('h', type=float, help='Height in inches')
+    parser.add_argument('--name', type=str, help='Device name', default='')
     args = parser.parse_args()
 
     b = common.Bounds((args.xo, args.xo+args.w), (args.yo, args.yo+args.h))
 
-    common.safe_plot(lambda ad: draw(ad, b), init)
+    common.safe_plot(lambda ad: draw(ad, b), init, args.name)

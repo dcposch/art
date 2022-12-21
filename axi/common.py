@@ -23,6 +23,11 @@ class Bounds:
     def __repr__(self) -> str:
         return self.__str__()
 
+    def __contains__(self, item: tuple[float, float]) -> bool:
+        ix, iy = item
+        x, y = self.x, self.y
+        return ix >= x[0] and ix <= x[1] and iy >= y[0] and iy <= y[1]
+
     def inset(self, l: float):
         """Returns a new bounds, inset from the current bounds by l inches."""
         x = self.x
@@ -79,12 +84,14 @@ def wait(ad: axidraw.AxiDraw, msg: str = "Press enter to continue..."):
     input(msg)
 
 
-def safe_plot(draw_func: typing.Callable[[axidraw.AxiDraw], None], init_func=default_init):
+def safe_plot(draw_func: typing.Callable[[axidraw.AxiDraw], None], init_func=default_init, name=''):
     """Plots something on an AxiDraw, catching errors to return to a power-off state."""
     # Set up
     print("Connecting to plotter...")
     ad = axidraw.AxiDraw()
     ad.interactive()
+    if name != '':
+        ad.options.port = name
     init_func(ad)
     assert ad.connect()
     ad.penup()

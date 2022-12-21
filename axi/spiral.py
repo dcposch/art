@@ -1,26 +1,25 @@
 import math
 import common
-
-# Bounds for letter paper, in inches
-margin = [0.5, 0.5]
-bx = [margin[0], 12-margin[0]]
-by = [margin[1], 9-margin[1]]
-
-print("Plotting an oval spiral")
-# Center
-cx = sum(bx) / 2
-cy = sum(by) / 2
-
-# Plot params
-r_offset = 0.325
-step_rad = 0.01
-in_per_rev = 0.4
-wobble_max_in = 0.15
-wobbles_per_in = 3
-num_revs = 18
+from pyaxidraw import axidraw
+import argparse
 
 
-def draw_spiral(ad):
+def draw_spiral(ad: axidraw.AxiDraw, b: common.Bounds):
+    print("Plotting an oval spiral")
+    # Center
+    cx = sum(b.x) / 2
+    cy = sum(b.y) / 2
+
+    # Plot params
+    r_offset = 0.325
+    step_rad = 0.01
+    in_per_rev = 0.4
+    wobble_max_in = 0.15
+    wobbles_per_in = 3
+
+    diag = math.sqrt((cx-b.x[0])**2 + (cy-b.y[0])**2)
+    num_revs = math.ceil(diag/in_per_rev)
+
     for i in range(math.floor(num_revs * 2 * math.pi / step_rad)):
         # Main spiral
         theta = i * step_rad
@@ -35,7 +34,10 @@ def draw_spiral(ad):
         x += math.cos(theta) * wobble
         y += math.sin(theta) * wobble
 
-        common.line_or_movep(ad, (x, y))
+        if (x, y) in b:
+            common.line_or_movep(ad, (x, y))
+        else:
+            ad.penup()
 
 
 def wobble_func(x, y):
@@ -48,4 +50,16 @@ def wobble_func(x, y):
 
 
 if __name__ == "__main__":
-    common.safe_plot(draw_spiral)
+    parser = argparse.ArgumentParser('spiral')
+    parser.add_argument('xo', type=float, help='Left x, in inches')
+    parser.add_argument('yo', type=float, help='Top y, in inches')
+    parser.add_argument('w', type=float, help='Width in inches')
+    parser.add_argument('h', type=float, help='Height in inches')
+    parser.add_argument('--name', type=str, help='Device name', default='')
+    args = parser.parse_args()
+
+    b = common.Bounds((args.xo, args.xo+args.w), (args.yo, args.yo+args.h))
+
+    common.safe_plot(lambda ad: draw_spiral(ad, b),
+                     common.default_init,
+                     args.name)

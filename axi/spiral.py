@@ -12,7 +12,7 @@ def draw_spiral(ad: axidraw.AxiDraw, b: common.Bounds):
 
     # Plot params
     r_offset = 0.325
-    step_rad = 0.01
+    step_in = 0.01
     in_per_rev = 0.4
     wobble_max_in = 0.15
     wobbles_per_in = 3
@@ -20,16 +20,17 @@ def draw_spiral(ad: axidraw.AxiDraw, b: common.Bounds):
     diag = math.sqrt((cx-b.x[0])**2 + (cy-b.y[0])**2)
     num_revs = math.ceil(diag/in_per_rev)
 
-    for i in range(math.floor(num_revs * 2 * math.pi / step_rad)):
+    max_theta = num_revs * 2 * math.pi
+    theta = 0
+    while True:
         # Main spiral
-        theta = i * step_rad
         r = r_offset + theta / (2 * math.pi) * in_per_rev
         x = cx + math.cos(theta) * r
         y = cy + math.sin(theta) * r
 
         # Add wobble for texture
         wobbliness = wobble_func(x, y)
-        wobble_rho = i * step_rad * r * wobbles_per_in * 2 * math.pi
+        wobble_rho = theta * r * wobbles_per_in * 2 * math.pi
         wobble = math.sin(wobble_rho) * wobbliness * wobble_max_in
         x += math.cos(theta) * wobble
         y += math.sin(theta) * wobble
@@ -38,6 +39,9 @@ def draw_spiral(ad: axidraw.AxiDraw, b: common.Bounds):
             common.line_or_movep(ad, (x, y))
         else:
             ad.penup()
+
+        # Advance a roughly constant distance, not a constant angle
+        theta += step_in / r
 
 
 def wobble_func(x, y):
